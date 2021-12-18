@@ -14483,10 +14483,11 @@ a.anchor-link {
  ┃ ┗ ubuntu_20211231.txt  logfile for #ubuntu on 31/12/2021
  ┣ discord/
  ┃ ┣ token                authentication token for discord
- ┃ ┣ channel_ids          lists of chats to scrape
- ┃ ┗ (channel_id).json    logfile for each chat
- ┗ raw_data.db            sqlite3 database of everything</code></pre>
-<p>So set it up:</p>
+ ┃ ┗ channel_ids          lists of chats to scrape
+ ┣ irc.db                 sqlite3 database of messages from irc channels
+ ┣ discord.db             sqlite3 database of messages from discord
+ ┗ words                  local copy of a dictionary of words separated by newlines</code></pre>
+<p>This structure will be created with the following code:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -14581,7 +14582,7 @@ In most conversation, they don't matter.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># to assign the user a unique ID</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># (name, database) -&gt; (database with name, index of name in database)</span>
 <span class="k">def</span> <span class="nf">name_to_id</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
@@ -14608,7 +14609,7 @@ In most conversation, they don't matter.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># to handle name changes.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># (old name, new name, database) -&gt; (database with names, index of name in database)</span>
 <span class="k">def</span> <span class="nf">renamed</span><span class="p">(</span><span class="n">name_old</span><span class="p">,</span> <span class="n">name_new</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">name_old</span> <span class="o">==</span> <span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
@@ -14977,12 +14978,6 @@ loaded channel #3
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Once again, cache this response to the database to avoid network limitations.</p>
-
-</div>
-</div>
-<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h3 id="Missing-data?">Missing data?<a class="anchor-link" href="#Missing-data?">&#182;</a></h3><p>For IRC, some days were missing logfiles.
 Imputing enough data to fill the gaps is very difficult considering the number of parameters.
 The gaps will be used as boundaries.</p>
@@ -15292,7 +15287,7 @@ $$\text{number of times }\textit{word}\text{ appears in the document} \cdot \ln\
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Words that do not appear in the dictionary. This includes URLs, IPs, typos, numbers, and punctuation.</p>
+<p>Words that do not appear in the dictionary. This includes URLs, IPs, typos, abbreviations, numbers, and punctuation.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
