@@ -3,7 +3,7 @@
 <head><meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>final</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>notebook</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 
 
 
@@ -14386,33 +14386,25 @@ a.anchor-link {
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>The existance of an algorithm to successfully identify message authors based on details of the message content can reduce anonymity to a certain degree. It does not de-anonymize everybody. Particularly, because the model has to be trained to identify a specific actor by being trained on that same actor.</p>
+<p>The existence of an algorithm to successfully identify message authors based on details of the message content can reduce anonymity to a certain degree. While this may be worrisome, it does not de-anonymize everybody. Particularly, because the model has to be trained to identify a specific actor by being trained on that same actor. So an individual can be targeted only if there is sufficient accessible data that can be linked to that individual already. Moving on.</p>
 
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>The idea here is to identify who said which messages based on different properties of the text:</p>
-<ul>
-<li>words used</li>
-<li>probability of using new words</li>
-<li>emotional direction</li>
-<li>typos</li>
-<li>punctuation</li>
-<li>capitalization</li>
-</ul>
+<p>The idea here is to identify who said which messages based on different properties of a message. These properties include, but are not limited to word choice and typos. All of these messages can come from social media platforms, message boards, forum sites, text messages, or wherever user-generated conversational text happens to be.</p>
 
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>These libraries will be used throughout this project.</p>
+<p>For this project, a set of python libraries will be used to collect, aggregate, process, and analyze the data. They are imported in this block of python code:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># data science</span>
@@ -14424,6 +14416,7 @@ a.anchor-link {
 <span class="c1"># data management</span>
 <span class="kn">import</span> <span class="nn">sqlite3</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
 
 <span class="c1"># internet data collection</span>
 <span class="kn">import</span> <span class="nn">requests</span>
@@ -14444,6 +14437,22 @@ a.anchor-link {
             <span class="n">cal</span><span class="p">()</span><span class="o">.</span><span class="n">itermonthdates</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># This notebook file is not at the root of the directory tree.</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;.gitignore&#39;</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14477,8 +14486,36 @@ a.anchor-link {
  ┃ ┣ channel_ids          lists of chats to scrape
  ┃ ┗ (channel_id).json    logfile for each chat
  ┗ raw_data.db            sqlite3 database of everything</code></pre>
+<p>So set it up:</p>
 
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">ensure_path</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">ensure_path</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">)</span>
+        
+<span class="n">ensure_path</span><span class="p">({</span>
+    <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;irc&#39;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s1">&#39;discord&#39;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="p">}</span>
+<span class="p">})</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
@@ -14507,13 +14544,13 @@ In most conversation, they don't matter.</p>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>First, to avoid abusing ubuntu's servers, a local cache of the relevant log files was made.</p>
+<p>First, to avoid abusing ubuntu's servers, a local cache of the relevant logfiles were made.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[197]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">2022</span><span class="p">):</span>
@@ -14541,7 +14578,7 @@ In most conversation, they don't matter.</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[186]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># to assign the user a unique ID</span>
@@ -14568,7 +14605,7 @@ In most conversation, they don't matter.</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[187]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># to handle name changes.</span>
@@ -14602,7 +14639,7 @@ In most conversation, they don't matter.</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># get the message log for `#ubuntu` for a particular day.</span>
@@ -14674,7 +14711,7 @@ In most conversation, they don't matter.</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[207]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">df_irc_ubuntu</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span>
@@ -14683,7 +14720,7 @@ In most conversation, they don't matter.</p>
     <span class="s1">&#39;reply_to&#39;</span><span class="p">,</span>
     <span class="s1">&#39;message&#39;</span>
 <span class="p">])</span>
-<span class="n">df_ubuntu_irc_names</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+<span class="n">df_irc_ubuntu_names</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span>
     <span class="s1">&#39;id&#39;</span><span class="p">,</span>
     <span class="s1">&#39;index&#39;</span><span class="p">,</span>
     <span class="s1">&#39;name&#39;</span><span class="p">,</span>
@@ -14698,28 +14735,48 @@ In most conversation, they don't matter.</p>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Pre-process all of 2015. <a href="https://irclogs.ubuntu.com/2015/05/22/%23ubuntu.txt">Some</a> <a href="https://irclogs.ubuntu.com/2015/11/09/%23ubuntu.txt">dates</a> are missing proper logfiles. More on this later.</p>
+<p>Pre-process all of 2015, then cache it to an sqlite database. If this database table already exists, load it (saves tens of hours).</p>
+<p><a href="https://irclogs.ubuntu.com/2015/05/22/%23ubuntu.txt">Some</a> <a href="https://irclogs.ubuntu.com/2015/11/09/%23ubuntu.txt">dates</a> are missing proper logfiles. More on this later.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">2016</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;data/irc.db&quot;</span><span class="p">)</span>
+<span class="n">year</span> <span class="o">=</span> <span class="mi">2015</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">df_irc_ubuntu</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT * FROM irc_ubuntu_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;loaded df_irc_ubuntu_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="n">df_irc_ubuntu_names</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT * FROM irc_ubuntu_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">_names&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;loaded df_irc_ubuntu_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">_names&quot;</span><span class="p">)</span>
+    
+<span class="k">except</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">month</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">12</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">day</span> <span class="ow">in</span> <span class="n">month_days</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">):</span>
             <span class="n">messages</span><span class="p">,</span> <span class="n">senders</span> <span class="o">=</span> <span class="n">irc_ubuntu_date</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">senders</span><span class="o">=</span><span class="n">sender_list</span><span class="p">)</span>
             <span class="n">df_irc_ubuntu</span> <span class="o">=</span> <span class="n">df_irc_ubuntu</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;processing&quot;</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">senders</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-        <span class="n">df_ubuntu_irc_names</span> <span class="o">=</span> <span class="n">df_ubuntu_irc_names</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-            <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span>
-            <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span>
-            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
-        <span class="p">},</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;processed&quot;</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">)</span>
+            
+    <span class="n">df_irc_ubuntu</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;irc_ubuntu_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;logged df_irc_ubuntu_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">senders</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+            <span class="n">df_irc_ubuntu_names</span> <span class="o">=</span> <span class="n">df_irc_ubuntu_names</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span>
+                <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
+            <span class="p">},</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="n">df_irc_ubuntu_names</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;irc_ubuntu_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">_names&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;logged df_irc_ubuntu_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">_names&quot;</span><span class="p">)</span>
+
+<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
      </div>
@@ -14739,353 +14796,14 @@ In most conversation, they don't matter.</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>processing 2015 1 1
-processing 2015 1 2
-processing 2015 1 3
-processing 2015 1 4
-processing 2015 1 5
-processing 2015 1 6
-processing 2015 1 7
-processing 2015 1 8
-processing 2015 1 9
-processing 2015 1 10
-processing 2015 1 11
-processing 2015 1 12
-processing 2015 1 13
-processing 2015 1 14
-processing 2015 1 15
-processing 2015 1 16
-processing 2015 1 17
-processing 2015 1 18
-processing 2015 1 19
-processing 2015 1 20
-processing 2015 1 21
-processing 2015 1 22
-processing 2015 1 23
-processing 2015 1 24
-processing 2015 1 25
-processing 2015 1 26
-processing 2015 1 27
-processing 2015 1 28
-processing 2015 1 29
-processing 2015 1 30
-processing 2015 1 31
-processing 2015 2 1
-processing 2015 2 2
-processing 2015 2 3
-processing 2015 2 4
-processing 2015 2 5
-processing 2015 2 6
-processing 2015 2 7
-processing 2015 2 8
-processing 2015 2 9
-processing 2015 2 10
-processing 2015 2 11
-processing 2015 2 12
-processing 2015 2 13
-processing 2015 2 14
-processing 2015 2 15
-processing 2015 2 16
-processing 2015 2 17
-processing 2015 2 18
-processing 2015 2 19
-processing 2015 2 20
-processing 2015 2 21
-processing 2015 2 22
-processing 2015 2 23
-processing 2015 2 24
-processing 2015 2 25
-processing 2015 2 26
-processing 2015 2 27
-processing 2015 2 28
-processing 2015 3 1
-processing 2015 3 2
-processing 2015 3 3
-processing 2015 3 4
-processing 2015 3 5
-processing 2015 3 6
-processing 2015 3 7
-processing 2015 3 8
-processing 2015 3 9
-processing 2015 3 10
-processing 2015 3 11
-processing 2015 3 12
-processing 2015 3 13
-processing 2015 3 14
-processing 2015 3 15
-processing 2015 3 16
-processing 2015 3 17
-processing 2015 3 18
-processing 2015 3 19
-processing 2015 3 20
-processing 2015 3 21
-processing 2015 3 22
-processing 2015 3 23
-processing 2015 3 24
-processing 2015 3 25
-processing 2015 3 26
-processing 2015 3 27
-processing 2015 3 28
-processing 2015 3 29
-processing 2015 3 30
-processing 2015 3 31
-processing 2015 4 1
-processing 2015 4 2
-processing 2015 4 3
-processing 2015 4 4
-processing 2015 4 5
-processing 2015 4 6
-processing 2015 4 7
-processing 2015 4 8
-processing 2015 4 9
-processing 2015 4 10
-processing 2015 4 11
-processing 2015 4 12
-processing 2015 4 13
-processing 2015 4 14
-processing 2015 4 15
-processing 2015 4 16
-processing 2015 4 17
-processing 2015 4 18
-processing 2015 4 19
-processing 2015 4 20
-processing 2015 4 21
-processing 2015 4 22
-weird line format === ChanServ changed the topic of #ubuntu to: Official Ubuntu Support Channel | IRC Guidelines: http://ubottu.com/y/gl | IRC info: http://ubottu.com/y/irc | Pastes to http://paste.ubuntu.com/ | Download: http://ubottu.com/y/dl | Currently supported: 10.04 LTS (server), 12.04 LTS, 14.04 LTS, 14.10, 15.04
-processing 2015 4 23
-processing 2015 4 24
-processing 2015 4 25
-processing 2015 4 26
-processing 2015 4 27
-processing 2015 4 28
-processing 2015 4 29
-processing 2015 4 30
-weird line format === ChanServ changed the topic of #ubuntu to: Official Ubuntu Support Channel | IRC Guidelines: http://ubottu.com/y/gl | IRC info: http://ubottu.com/y/irc | Pastes to http://paste.ubuntu.com/ | Download: http://ubottu.com/y/dl | Currently supported: 12.04 LTS, 14.04 LTS, 14.10, 15.04
-processing 2015 5 1
-processing 2015 5 2
-processing 2015 5 3
-processing 2015 5 4
-processing 2015 5 5
-processing 2015 5 6
-processing 2015 5 7
-processing 2015 5 8
-processing 2015 5 9
-processing 2015 5 10
-processing 2015 5 11
-processing 2015 5 12
-processing 2015 5 13
-processing 2015 5 14
-processing 2015 5 15
-processing 2015 5 16
-processing 2015 5 17
-processing 2015 5 18
-processing 2015 5 19
-processing 2015 5 20
-processing 2015 5 21
-weird line format &lt;!DOCTYPE HTML PUBLIC &#34;-//IETF//DTD HTML 2.0//EN&#34;&gt;
-weird line format &lt;html&gt;&lt;head&gt;
-weird line format &lt;title&gt;404 Not Found&lt;/title&gt;
-weird line format &lt;/head&gt;&lt;body&gt;
-weird line format &lt;h1&gt;Not Found&lt;/h1&gt;
-weird line format &lt;p&gt;The requested URL was not found on this server.&lt;/p&gt;
-weird line format &lt;hr&gt;
-weird line format &lt;address&gt;Apache/2.4.29 (Ubuntu) Server at irclogs.ubuntu.com Port 443&lt;/address&gt;
-weird line format &lt;/body&gt;&lt;/html&gt;
-processing 2015 5 22
-weird line format &lt;!DOCTYPE HTML PUBLIC &#34;-//IETF//DTD HTML 2.0//EN&#34;&gt;
-weird line format &lt;html&gt;&lt;head&gt;
-weird line format &lt;title&gt;404 Not Found&lt;/title&gt;
-weird line format &lt;/head&gt;&lt;body&gt;
-weird line format &lt;h1&gt;Not Found&lt;/h1&gt;
-weird line format &lt;p&gt;The requested URL was not found on this server.&lt;/p&gt;
-weird line format &lt;hr&gt;
-weird line format &lt;address&gt;Apache/2.4.29 (Ubuntu) Server at irclogs.ubuntu.com Port 443&lt;/address&gt;
-weird line format &lt;/body&gt;&lt;/html&gt;
-processing 2015 5 23
-weird line format &lt;!DOCTYPE HTML PUBLIC &#34;-//IETF//DTD HTML 2.0//EN&#34;&gt;
-weird line format &lt;html&gt;&lt;head&gt;
-weird line format &lt;title&gt;404 Not Found&lt;/title&gt;
-weird line format &lt;/head&gt;&lt;body&gt;
-weird line format &lt;h1&gt;Not Found&lt;/h1&gt;
-weird line format &lt;p&gt;The requested URL was not found on this server.&lt;/p&gt;
-weird line format &lt;hr&gt;
-weird line format &lt;address&gt;Apache/2.4.29 (Ubuntu) Server at irclogs.ubuntu.com Port 443&lt;/address&gt;
-weird line format &lt;/body&gt;&lt;/html&gt;
-processing 2015 5 24
-weird line format &lt;!DOCTYPE HTML PUBLIC &#34;-//IETF//DTD HTML 2.0//EN&#34;&gt;
-weird line format &lt;html&gt;&lt;head&gt;
-weird line format &lt;title&gt;404 Not Found&lt;/title&gt;
-weird line format &lt;/head&gt;&lt;body&gt;
-weird line format &lt;h1&gt;Not Found&lt;/h1&gt;
-weird line format &lt;p&gt;The requested URL was not found on this server.&lt;/p&gt;
-weird line format &lt;hr&gt;
-weird line format &lt;address&gt;Apache/2.4.29 (Ubuntu) Server at irclogs.ubuntu.com Port 443&lt;/address&gt;
-weird line format &lt;/body&gt;&lt;/html&gt;
-processing 2015 5 25
-weird line format &lt;!DOCTYPE HTML PUBLIC &#34;-//IETF//DTD HTML 2.0//EN&#34;&gt;
-weird line format &lt;html&gt;&lt;head&gt;
-weird line format &lt;title&gt;404 Not Found&lt;/title&gt;
-weird line format &lt;/head&gt;&lt;body&gt;
-weird line format &lt;h1&gt;Not Found&lt;/h1&gt;
-weird line format &lt;p&gt;The requested URL was not found on this server.&lt;/p&gt;
-weird line format &lt;hr&gt;
-weird line format &lt;address&gt;Apache/2.4.29 (Ubuntu) Server at irclogs.ubuntu.com Port 443&lt;/address&gt;
-weird line format &lt;/body&gt;&lt;/html&gt;
-processing 2015 5 26
-weird line format &lt;!DOCTYPE HTML PUBLIC &#34;-//IETF//DTD HTML 2.0//EN&#34;&gt;
-weird line format &lt;html&gt;&lt;head&gt;
-weird line format &lt;title&gt;404 Not Found&lt;/title&gt;
-weird line format &lt;/head&gt;&lt;body&gt;
-weird line format &lt;h1&gt;Not Found&lt;/h1&gt;
-weird line format &lt;p&gt;The requested URL was not found on this server.&lt;/p&gt;
-weird line format &lt;hr&gt;
-weird line format &lt;address&gt;Apache/2.4.29 (Ubuntu) Server at irclogs.ubuntu.com Port 443&lt;/address&gt;
-weird line format &lt;/body&gt;&lt;/html&gt;
-processing 2015 5 27
-weird line format &lt;!DOCTYPE HTML PUBLIC &#34;-//IETF//DTD HTML 2.0//EN&#34;&gt;
-weird line format &lt;html&gt;&lt;head&gt;
-weird line format &lt;title&gt;404 Not Found&lt;/title&gt;
-weird line format &lt;/head&gt;&lt;body&gt;
-weird line format &lt;h1&gt;Not Found&lt;/h1&gt;
-weird line format &lt;p&gt;The requested URL was not found on this server.&lt;/p&gt;
-weird line format &lt;hr&gt;
-weird line format &lt;address&gt;Apache/2.4.29 (Ubuntu) Server at irclogs.ubuntu.com Port 443&lt;/address&gt;
-weird line format &lt;/body&gt;&lt;/html&gt;
-processing 2015 5 28
-processing 2015 5 29
-processing 2015 5 30
-processing 2015 5 31
-processing 2015 6 1
-processing 2015 6 2
-processing 2015 6 3
-processing 2015 6 4
-processing 2015 6 5
-processing 2015 6 6
-processing 2015 6 7
-processing 2015 6 8
-processing 2015 6 9
-processing 2015 6 10
-processing 2015 6 11
-processing 2015 6 12
-processing 2015 6 13
-processing 2015 6 14
-processing 2015 6 15
-processing 2015 6 16
-processing 2015 6 17
-processing 2015 6 18
-processing 2015 6 19
-processing 2015 6 20
-processing 2015 6 21
-processing 2015 6 22
-processing 2015 6 23
-processing 2015 6 24
-processing 2015 6 25
-processing 2015 6 26
-processing 2015 6 27
-processing 2015 6 28
-processing 2015 6 29
-processing 2015 6 30
-processing 2015 7 1
-processing 2015 7 2
-processing 2015 7 3
-processing 2015 7 4
-processing 2015 7 5
-processing 2015 7 6
-processing 2015 7 7
-processing 2015 7 8
-processing 2015 7 9
-processing 2015 7 10
-processing 2015 7 11
-processing 2015 7 12
-processing 2015 7 13
-processing 2015 7 14
-processing 2015 7 15
-processing 2015 7 16
-processing 2015 7 17
-processing 2015 7 18
-processing 2015 7 19
-processing 2015 7 20
-processing 2015 7 21
-processing 2015 7 22
-processing 2015 7 23
-weird line format === Flannel changed the topic of #ubuntu to: Official Ubuntu Support Channel | IRC Guidelines: http://ubottu.com/y/gl | IRC info: http://ubottu.com/y/irc | Pastes to http://paste.ubuntu.com/ | Download: http://ubottu.com/y/dl | Currently supported: 12.04 LTS, 14.04 LTS, 15.04
-processing 2015 7 24
-processing 2015 7 25
-processing 2015 7 26
-processing 2015 7 27
-processing 2015 7 28
-processing 2015 7 29
-processing 2015 7 30
-processing 2015 7 31
-processing 2015 8 1
-processing 2015 8 2
-processing 2015 8 3
-processing 2015 8 4
-processing 2015 8 5
-processing 2015 8 6
-processing 2015 8 7
-processing 2015 8 8
-processing 2015 8 9
-processing 2015 8 10
-processing 2015 8 11
-processing 2015 8 12
-processing 2015 8 13
-processing 2015 8 14
-processing 2015 8 15
-processing 2015 8 16
-processing 2015 8 17
-processing 2015 8 18
-processing 2015 8 19
-processing 2015 8 20
-processing 2015 8 21
-processing 2015 8 22
-processing 2015 8 23
-processing 2015 8 24
-processing 2015 8 25
-processing 2015 8 26
-processing 2015 8 27
-processing 2015 8 28
-processing 2015 8 29
-processing 2015 8 30
-processing 2015 8 31
-processing 2015 9 1
-processing 2015 9 2
-processing 2015 9 3
-processing 2015 9 4
-processing 2015 9 5
-processing 2015 9 6
-processing 2015 9 7
-processing 2015 9 8
-processing 2015 9 9
+<pre>loaded df_irc_ubuntu_2015
+loaded df_irc_ubuntu_2015_names
 </pre>
 </div>
 </div>
 
 </div>
 
-</div>
-
-</div>
-<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Cache the slightly processed data, because the last step took over an hour.</p>
-
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;raw_data.db&quot;</span><span class="p">)</span>
-<span class="n">df_irc_ubuntu</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;irc_ubuntu_2015&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
-<span class="n">df_irc_ubuntu_names</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;irc_ubuntu_2015_names&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
 </div>
 
 </div>
@@ -15120,7 +14838,7 @@ For this, messages with nonempty content will be used.</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">discord_channel_messages</span><span class="p">(</span><span class="n">authorization_token</span><span class="p">,</span> <span class="n">channel_id</span><span class="p">):</span>
@@ -15131,16 +14849,24 @@ For this, messages with nonempty content will be used.</p>
         <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="n">authorization_token</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">first_message</span> <span class="o">=</span> <span class="mi">0</span>
+    
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;https://discord.com/api/v9/channels/</span><span class="si">{</span><span class="n">channel_id</span><span class="si">}</span><span class="s2">/messages?limit=100&amp;after=</span><span class="si">{</span><span class="n">first_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;https://discord.com/api/v9/channels/</span><span class="si">{</span><span class="n">channel_id</span><span class="si">}</span><span class="s2">/messages?limit=100&amp;after=</span><span class="si">{</span><span class="n">first_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="n">headers</span>
+        <span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s1">&#39;retry_after&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;retry_after&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;retry_after&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">continue</span>
+        
         <span class="n">messages</span> <span class="o">+=</span> <span class="n">data</span>
         <span class="n">first_message</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
             <span class="k">break</span>
+    
     <span class="k">return</span> <span class="p">[</span>
         <span class="p">[</span>
             <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">isoparse</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]),</span>
@@ -15159,17 +14885,19 @@ For this, messages with nonempty content will be used.</p>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Load private authentication and location parameters</p>
+<p>Load private authentication and location parameters:</p>
+<p><code>data/discord/token</code> is your user authentication token to access your data on Discord.</p>
+<p><code>data/discord/channel_ids</code> is a list of channel IDs to scrape all the messages from.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/discord/token&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">token</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">discord_token</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
     
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/discord/channel_ids&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">discord_channels</span> <span class="o">=</span> <span class="p">[</span><span class="n">cid</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">]</span>
@@ -15183,26 +14911,67 @@ For this, messages with nonempty content will be used.</p>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Actually log the data now</p>
+<p>Proceeding to log and cache the data:</p>
 
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">discord_all</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([</span>
-    <span class="p">[</span>
-        <span class="n">channel</span><span class="p">,</span>
-        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">discord_channel_messages</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">channel</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">,</span><span class="s1">&#39;sender&#39;</span><span class="p">,</span><span class="s1">&#39;message&#39;</span><span class="p">,</span><span class="s1">&#39;edited&#39;</span><span class="p">])</span>
-    <span class="p">]</span> <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">discord_channels</span>
-<span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">conn_discord</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;data/discord.db&quot;</span><span class="p">)</span>
+
+<span class="n">discord_all</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">discord_channels</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">discord_all</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT * FROM discord_</span><span class="si">{</span><span class="n">channel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">conn_discord</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;loaded channel #</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">discord_all</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">discord_channel_messages</span><span class="p">(</span><span class="n">discord_token</span><span class="p">,</span> <span class="n">channel</span><span class="p">),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                <span class="s1">&#39;date&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;sender&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;message&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;edited&#39;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">discord_all</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;discord_</span><span class="si">{</span><span class="n">channel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">conn_discord</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;logged channel #</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">conn_discord</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
      </div>
 </div>
 </div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>loaded channel #0
+loaded channel #1
+loaded channel #2
+loaded channel #3
+</pre>
+</div>
+</div>
+
+</div>
+
 </div>
 
 </div>
@@ -15211,23 +14980,6 @@ For this, messages with nonempty content will be used.</p>
 <p>Once again, cache this response to the database to avoid network limitations.</p>
 
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;raw_data_discord.db&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">channel</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">discord_channels</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">data</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;discord_</span><span class="si">{</span><span class="n">channel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
@@ -15245,14 +14997,552 @@ Because the actor who wrote the original message also edited the message, it sho
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Incorrect-data?">Incorrect data?<a class="anchor-link" href="#Incorrect-data?">&#182;</a></h3><p>It is possible that data may be incorrect. There are a few ways that come to mind:</p>
+<ol>
+<li>logfiles with mislabeled dates</li>
+<li>name matching/impersonation of a user</li>
+<li>quoting</li>
+<li>manipulation by platform administrator</li>
+</ol>
+<p>For mislabeling, this can be solved by looking at each day individually.
+For the collected data, it can only be a problem for IRC.</p>
+<p>Impersonation is harder to solve.
+If "Tom" disconnects, unless he was a registered user, someone else may connect with the name "Tom" in IRC.
+Multiple people may also use the same account, so there may be some sort of bimodal distribution of features for one account.</p>
+<p>For quoting, in IRC, it is infrequent due to the message size limitations. In Discord, the quote user feature is builtin, and shows up in a different field from the message content. So this shouldn't be a direct issue in conflict between users. It may only appear if two users quote the same material. But this should be accounted for by a model.</p>
+<p>For administrator manipulation, nothing can be done. This is highly unlikely on smaller 1-to-1 message logs, but may exist on IRC platforms if someone posts something against the platform's terms of service for one reason or another.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <hr>
 
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="Exploratory-Data-Analysis">Exploratory Data Analysis<a class="anchor-link" href="#Exploratory-Data-Analysis">&#182;</a></h2>
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Now that the data has been aggregated successfully, we should analyze different properties of the messages to build a proper and functional model that can (somewhat) reliably determine which actor sent which message. For that, we need to calculate some statistics regarding the data set.</p>
+<p>To start, we will define what we mean by common terms for lingustic analyses:</p>
+<ul>
+<li>document: an individual message</li>
+<li>corpus: the entire conversation (over some range)</li>
+<li>author/actor: message sender</li>
+</ul>
 
 </div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Now, the first parameter that comes to mind is the usage freqency of particular words. A good statistic for this is <a href="http://tfidf.com/">term frequency-inverse document frequency</a>. This ranks each word based on the frequency in a message, weighted by the relative importance in the entire conversation.</p>
+$$\text{number of times }\textit{word}\text{ appears in the document} \cdot \ln\left(\frac{\text{number of documents in corpus}}{\text{number of documents with }\textit{word}\text{ in it}}\right)$$
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>As a precursor, the way that words are extracted from a document is abstracted out for standardization.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[13]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">words</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\s]+&quot;</span><span class="p">,</span> <span class="n">document</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>And a standard list of words that are spelled correctly.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;data/words&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">vocabulary_standard</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>First, a function to count the word frequency in a list is constructed.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">word_frequency_list</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
+    <span class="n">vocabulary</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">series</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">word</span> <span class="ow">in</span> <span class="n">vocabulary</span><span class="p">):</span>
+                <span class="n">vocabulary</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vocabulary</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">vocabulary</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Now we need to determine the overall word frequency, and then the frequency per author</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">discord_all</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+<span class="n">word_frequency_in_corpus</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span>
+        <span class="n">word_frequency_list</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">)),</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;word&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;freq&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">total_vocabulary</span> <span class="o">=</span> <span class="n">word_frequency_in_corpus</span><span class="p">[</span><span class="s1">&#39;word&#39;</span><span class="p">]</span>
+
+<span class="n">word_frequency_in_corpus</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">word_frequency_in_corpus</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">word_frequency_in_corpus</span> <span class="o">=</span> <span class="n">word_frequency_in_corpus</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+    <span class="n">by</span> <span class="o">=</span> <span class="s1">&#39;freq&#39;</span><span class="p">,</span>
+    <span class="n">ascending</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">ignore_index</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">sender</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;sender&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+    <span class="n">word_frequency_by_sender</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span>
+            <span class="n">word_frequency_list</span><span class="p">(</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;sender&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">sender</span><span class="p">][</span><span class="s1">&#39;message&#39;</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">)),</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;word&#39;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;freq(</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">word_frequency_in_corpus</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+        <span class="n">word_frequency_in_corpus</span><span class="p">,</span>
+        <span class="n">word_frequency_by_sender</span><span class="p">,</span>
+        <span class="n">on</span> <span class="o">=</span> <span class="s1">&#39;word&#39;</span><span class="p">,</span>
+        <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="n">word_frequency_in_corpus</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">word_frequency_in_corpus</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[16]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>word</th>
+      <td>i</td>
+      <td>the</td>
+      <td>it</td>
+      <td>to</td>
+      <td>a</td>
+      <td>you</td>
+      <td>and</td>
+      <td>like</td>
+      <td>is</td>
+      <td>ok</td>
+    </tr>
+    <tr>
+      <th>freq</th>
+      <td>11719</td>
+      <td>6261</td>
+      <td>5743</td>
+      <td>5148</td>
+      <td>4806</td>
+      <td>4682</td>
+      <td>3801</td>
+      <td>3378</td>
+      <td>3239</td>
+      <td>2960</td>
+    </tr>
+    <tr>
+      <th>freq(0)</th>
+      <td>4765</td>
+      <td>3789</td>
+      <td>3002</td>
+      <td>2728</td>
+      <td>2656</td>
+      <td>3510</td>
+      <td>1581</td>
+      <td>1088</td>
+      <td>1897</td>
+      <td>1156</td>
+    </tr>
+    <tr>
+      <th>freq(1)</th>
+      <td>6954</td>
+      <td>2472</td>
+      <td>2741</td>
+      <td>2420</td>
+      <td>2150</td>
+      <td>1172</td>
+      <td>2220</td>
+      <td>2290</td>
+      <td>1342</td>
+      <td>1804</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Second, a function to count how many times a set of words occurs in a sentence.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Words that do not appear in the dictionary. This includes URLs, IPs, typos, numbers, and punctuation.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[17]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">word_frequency_in_corpus</span><span class="p">[</span><span class="o">~</span><span class="n">word_frequency_in_corpus</span><span class="p">[</span><span class="s1">&#39;word&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">vocabulary_standard</span><span class="p">)]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[17]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>9</th>
+      <th>17</th>
+      <th>22</th>
+      <th>23</th>
+      <th>33</th>
+      <th>37</th>
+      <th>41</th>
+      <th>59</th>
+      <th>65</th>
+      <th>72</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>word</th>
+      <td>ok</td>
+      <td>lol</td>
+      <td>im</td>
+      <td></td>
+      <td>dont</td>
+      <td>lmao</td>
+      <td>idk</td>
+      <td>?</td>
+      <td>thats</td>
+      <td>didnt</td>
+    </tr>
+    <tr>
+      <th>freq</th>
+      <td>2960</td>
+      <td>2388</td>
+      <td>2233</td>
+      <td>2130</td>
+      <td>1417</td>
+      <td>1307</td>
+      <td>1182</td>
+      <td>763</td>
+      <td>673</td>
+      <td>600</td>
+    </tr>
+    <tr>
+      <th>freq(0)</th>
+      <td>1156</td>
+      <td>901</td>
+      <td>695</td>
+      <td>1098</td>
+      <td>534</td>
+      <td>378</td>
+      <td>350</td>
+      <td>322</td>
+      <td>304</td>
+      <td>260</td>
+    </tr>
+    <tr>
+      <th>freq(1)</th>
+      <td>1804</td>
+      <td>1487</td>
+      <td>1538</td>
+      <td>1032</td>
+      <td>883</td>
+      <td>929</td>
+      <td>832</td>
+      <td>441</td>
+      <td>369</td>
+      <td>340</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Words with dictionary-correct spellings:</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[18]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">word_frequency_in_corpus</span><span class="p">[</span><span class="n">word_frequency_in_corpus</span><span class="p">[</span><span class="s1">&#39;word&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">vocabulary_standard</span><span class="p">)]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[18]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>10</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>word</th>
+      <td>i</td>
+      <td>the</td>
+      <td>it</td>
+      <td>to</td>
+      <td>a</td>
+      <td>you</td>
+      <td>and</td>
+      <td>like</td>
+      <td>is</td>
+      <td>that</td>
+    </tr>
+    <tr>
+      <th>freq</th>
+      <td>11719</td>
+      <td>6261</td>
+      <td>5743</td>
+      <td>5148</td>
+      <td>4806</td>
+      <td>4682</td>
+      <td>3801</td>
+      <td>3378</td>
+      <td>3239</td>
+      <td>2842</td>
+    </tr>
+    <tr>
+      <th>freq(0)</th>
+      <td>4765</td>
+      <td>3789</td>
+      <td>3002</td>
+      <td>2728</td>
+      <td>2656</td>
+      <td>3510</td>
+      <td>1581</td>
+      <td>1088</td>
+      <td>1897</td>
+      <td>1465</td>
+    </tr>
+    <tr>
+      <th>freq(1)</th>
+      <td>6954</td>
+      <td>2472</td>
+      <td>2741</td>
+      <td>2420</td>
+      <td>2150</td>
+      <td>1172</td>
+      <td>2220</td>
+      <td>2290</td>
+      <td>1342</td>
+      <td>1377</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 </div>
 </body>
 
